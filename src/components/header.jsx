@@ -1,8 +1,49 @@
 import Image from "next/image"
 import Link from "next/link"
 import {HiOutlineLogin} from "react-icons/hi"
+import useCookies from 'react-cookie/cjs/useCookies'
+import { useState, useEffect } from "react"
+import axios from "axios"
 
-const Header = ({isLogin}) => {
+
+const Header = () => {
+    const [cookies, setCookies, removeCookies] = useCookies()
+
+    const [user, setUser] = useState({})
+    const [loading, setLoading] = useState(true)
+    if (cookies.token) {
+        useEffect(() => {
+            const fetchData = async () => {
+                try{
+                    const data = await axios.get(
+                        `https://hackaton-tinder.onrender.com/user/get-current-user`, {
+                            headers: {
+                                "Authorization": `Bearer ${cookies.token}`
+                            }
+                        }
+                    ).then(
+                        (result) => {
+                            setUser(result.data)
+                        }
+                    )
+                    
+                }
+                catch (e) {
+                    console.log(e)
+                    if (e.response.status === 400) {
+                        window.location.href = "/login"
+                    }
+                }
+            }
+            if (loading) {
+                fetchData()
+                setLoading(false)
+    
+            }
+            
+        } )
+    }
+    
   return (
     <div className="flex w-full h-32 bg-blue justify-around">
         <div className="inline relative top-8">
@@ -15,7 +56,7 @@ const Header = ({isLogin}) => {
                     <Link href={"/profiles"}>Профили</Link>
                 </li>
                 <li className="inline mr-10">
-                    <Link href={"/"}>Настройки</Link>
+                    <Link href={"/settings"}>Настройки</Link>
                 </li>
                 <li className="inline">
                     <Link href={"/"}>Запросы</Link>
@@ -23,11 +64,11 @@ const Header = ({isLogin}) => {
             </ul>
         </div>
         <div className="text-xl relative font-semibold top-10">
-            {   !isLogin ?
+            {   !user ?
                 <Link href={"/login"}>
                     <HiOutlineLogin size={"30px"}/>
                 </Link>
-                : <h1>Профиль</h1>
+                : <Link href={"/profiles/me"}><h1 className="">{user.username}</h1></Link>
             }
             
         </div>

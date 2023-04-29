@@ -2,15 +2,23 @@ import Image from 'next/image'
 import { Montserrat } from 'next/font/google'
 import Link from 'next/link'
 import Header from "@/components/header.jsx"
-
+import useCookies from 'react-cookie/cjs/useCookies'
 
 const montserrat = Montserrat({ subsets: ['latin'] })
 
 export default function Home() {
+  const [cookies, setCookies, removeCookies] = useCookies()
+  console.log(cookies)
+  let isLogin
+  if (cookies) {
+    isLogin=true
+  } else {
+    isLogin=false
+  }
   return (
     <main className={`${montserrat.className}`}>
       <div>
-        <Header isLogin={false}/>
+        <Header isLogin={isLogin}/>
         <div className='flex mt-20 ml-auto mr-auto justify-evenly'>
           <div>
               <h1 className='text-4xl font-extrabold'>Ищешь команду?</h1>
