@@ -30,7 +30,7 @@ const Header = () => {
                 }
                 catch (e) {
                     console.log(e)
-                    if (e.response.status === 400) {
+                    if (e.response.status === 400 || 401) {
                         window.location.href = "/login"
                     }
                 }
@@ -47,7 +47,7 @@ const Header = () => {
   return (
     <div className="flex w-full h-32 bg-blue justify-around">
         <div className="inline relative top-8">
-            <Image src={"/favicon.png"} width={45} height={53} className="inline"/>
+            <Image src={"/favicon.png"} width={45} height={53} className="inline" alt="kk"/>
             <h1 className="text-xl font-bold inline ml-10">QuizzyWork</h1>
         </div>
         <div className="text-xl font-bold relative top-10">
@@ -56,10 +56,16 @@ const Header = () => {
                     <Link href={"/profiles"}>Профили</Link>
                 </li>
                 <li className="inline mr-10">
+                    <Link href={"/projects/1"}>Проекты</Link>
+                </li>
+                <li className="inline mr-10">
+                    <Link href={"/projects/create"}>Создать проект</Link>
+                </li>
+                <li className="inline mr-10">
                     <Link href={"/settings"}>Настройки</Link>
                 </li>
                 <li className="inline">
-                    <Link href={"/"}>Запросы</Link>
+                    <Link href={"/requests"}>Запросы</Link>
                 </li>
             </ul>
         </div>

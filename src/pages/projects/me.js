@@ -13,17 +13,21 @@ const montserrat = Montserrat({ subsets: ['latin'] })
 const Profiles = () => {
     const router = useRouter()
     const [cookies, setCookies, removeCookies] = useCookies()
-    const {id} = router.query
-    const [user, setUser] = useState({})
+
+    
+    const [project, setProjects] = useState({})
     const [loading, setLoading] = useState(true)
     useEffect(() => {
         const fetchData = async () => {
             try{
                 const data = await axios.get(
-                    `https://hackaton-tinder.onrender.com/user/get-user-by-id/${id}`
+                    `https://hackaton-tinder.onrender.com/profile/get-profile-of-current-user`,{
+                        headers: {Authorization: 'Bearer '+cookies.token}
+                    }
                 ).then(
                     (result) => {
-                        setUser(result.data)
+                        setProjects(result.data)
+                        setLoading(false)
                     }
                 )
                 
@@ -32,23 +36,32 @@ const Profiles = () => {
                 console.log(e)
             }
         }
-        if (loading && id) {
+        if (loading) {
             fetchData()
-            setLoading(false)
-
         }
         
     } )
-    const createRequest = async () => {
-        const data = await axios({
-            url: `https://hackaton-tinder.onrender.com/request/request-to-user-by-id/${id}`,
-            method: "GET",
-            headers: {Authorization: 'Bearer '+cookies.token}
-        })
+    const nextPage = () => {
+        window.location.href = `/projects/${Number(id)+1}`
     }
-    // console.log(user.topics)
+    const sendRequest = async () => {
+        try {
+            const data = await axios({
+                url: `https://hackaton-tinder.onrender.com/request/request-from-user-to-profile/${id}`,
+                method: "GET",
+                headers: {
+                    
+                        "Authorization": `Bearer ${cookies.token}`
+                    
+                }
+            })
+        } catch (e) {
+
+        }
+    }
     return (
         <main className={` ${montserrat.className} min-h-screen min bg-blue `}>
+    <div>
         <Header />
         <div className='flex align-middle justify-center'>
         <div className='flex w-5/12 h-2/3 bg-white rounded-3xl align-middle relative top-32'>
@@ -60,22 +73,28 @@ const Profiles = () => {
                         <Image src={"/picprofile.jpg"} width={320} height={179} className='rounded-xl'/>
                     </div>
                     <div className='text-center'>
-                        <h2 className='text-lg font-medium'>Никнейм</h2>
-                        <h1 className='text-2xl font-semibold mb-5'>{user.username}</h1>
-                        <h2 className='text-lg font-medium'>Про пользователя</h2>
-                        <h1 className='text-2xl font-semibold mb-5'>{user.about}</h1>
+                        <h2 className='text-lg font-medium'>Название</h2>
+                        <h1 className='text-2xl font-semibold mb-5'>{project.name}</h1>
+                        <h2 className='text-lg font-medium'>Про проект</h2>
+                        <h1 className='text-2xl font-semibold mb-5'>{project.text}</h1>
                         <h2 className='text-lg font-medium'>Темы</h2>
-                        {user.topics?.map((value, inx) => (<h1 className='text-2xl font-semibold' key={inx}>{value.name}</h1>))}
+                        {project.topics?.map((value, inx) => (<h1 className='text-2xl font-semibold' key={inx}>{value.name}</h1>))}
                         {
-                            user.topics===[] ? <h1 className='text-2xl font-semibold'>Не указано</h1>
+                            project.topics==[] ? <h1 className='text-2xl font-semibold'>Не указано</h1>
                             : <></>
                         }
-                        <button onClick={createRequest}>Кинуть запрос</button>
                     </div>
+                </div>
+                <div className='grid grid-cols-2'>
+                    <button onClick={nextPage}>Дальше</button>
+                    <button onClick={sendRequest}>Отправить заявку</button>
+
                 </div>
             </div>
         </div>
         </div>
+        </div>
+        
         </main>
   )
 }
